@@ -1,0 +1,27 @@
+[
+  {
+    "age": 24,
+    "married": false,
+    "lastName": "Raka",
+    "firstName": "Gybran",
+    "address": {
+      "country": "Indonesia",
+      "city": "Jakarta",
+      "street": "Jl. Merdeka"
+    }
+  },
+  {
+    "id": "1",
+    "name": "Eko",
+    "hobbies": [
+      "Reading",
+      "Coding",
+      "Traveling"
+    ],
+    "address": {
+      "street": "Jl. Merdeka",
+      "city": "Jakarta",
+      "country": "Indonesia"
+    }
+  }
+]
