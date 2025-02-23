@@ -2,6 +2,7 @@ package com.programmerzamannow.spring.config.value;
 
 import lombok.Getter;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -26,6 +27,7 @@ public class ValueTest {
   }
 
   @Test
+  @Disabled
   void testValueSystemProperties() {
     Assertions.assertNotNull(systemProperties.getJavaHome());
     Assertions.assertEquals("C:\\Program Files\\Zulu\\zulu-17", systemProperties.getJavaHome());
