@@ -41,7 +41,7 @@ class PersonControllerTest {
             .param("socialMedias[1].name", "Instagram")
             .param("socialMedias[1].location", "https://instagram.com/programmerzamannow")
     ).andExpectAll(
-        status().isCreated(),
+        status().isOk(),
         content().string(Matchers.containsString("Success create person Eko Kurniawan Khannedy " +
             "with email test@gmail.com and phone 0812345678 with address " +
             "Jl. Belum Jadi, Jakarta, Indonesia 13890"))
@@ -70,7 +70,7 @@ class PersonControllerTest {
                     .param("socialMedias[1].location", "https://instagram.com/programmerzamannow")
     ).andExpectAll(
             status().isBadRequest(),
-            content().string(Matchers.containsString("Validation Error"))
+            content().string(Matchers.containsString("You send invalid data"))
     );
   }
 }
