@@ -1,0 +1,15 @@
+version: "3.8"
+
+services:
+  jpa-db:
+    container_name: jpa-db
+    image: mysql:latest
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=admin
+      - MYSQL_USER=user
+      - MYSQL_PASSWORD=password
+      - MYSQL_DATABASE=belajar_spring_data_jpa
+    volumes:
+      - "C:/Users/LGSM036/Documents/udemy/docker-volume/belajar-spring-data-jpa:/var/lib/mysql"
