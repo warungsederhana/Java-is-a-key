@@ -14,7 +14,7 @@ public class EntityManagerTest {
     private EntityManagerFactory entityManagerFactory;
 
     @Test
-    void testEntityManagerFacotry() {
+    void testEntityManagerFactory() {
         Assertions.assertNotNull(entityManagerFactory);
 
         EntityManager entityManager = entityManagerFactory.createEntityManager();
