@@ -3,6 +3,8 @@ package programmerzamannow.springdata.jpa.entities;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.util.List;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
@@ -15,4 +17,7 @@ public class Category {
     private long id;
 
     private String name;
+
+    @OneToMany(mappedBy = "category")
+    private List<Product> products;
 }
