@@ -12,4 +12,5 @@ services:
       - MYSQL_PASSWORD=password
       - MYSQL_DATABASE=belajar_spring_data_jpa
     volumes:
-      - "C:/Users/LGSM036/Documents/udemy/docker-volume/belajar-spring-data-jpa:/var/lib/mysql"
+      # - "C:/Users/LGSM036/Documents/udemy/docker-volume/belajar-spring-data-jpa:/var/lib/mysql"
+        - "/docker-volume:/var/lib/mysql"

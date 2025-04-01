@@ -3,15 +3,16 @@ package programmerzamannow.springdata.jpa.repositories;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.transaction.support.TransactionOperations;
 import programmerzamannow.springdata.jpa.entities.Category;
 import programmerzamannow.springdata.jpa.entities.Product;
+import programmerzamannow.springdata.jpa.models.ProductPrice;
+import programmerzamannow.springdata.jpa.models.SimpleProduct;
 
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -132,10 +133,141 @@ class ProductRepositoryTest {
         assertEquals(0, delete);
     }
 
+    // named query test
     @Test
     void searchProductUsingName() {
         List<Product> products = productRepository.searchProductUsingName("Apple iPhone 14 Pro Max");
         assertEquals(1, products.size());
         assertEquals("Apple iPhone 14 Pro Max", products.get(0).getName());
+    }
+
+    // named query test
+    @Test
+    void searchProductUsingNamePageable() {
+        Pageable pageable = PageRequest.of(0, 1);
+        List<Product> products = productRepository.searchProductUsingName("Apple iPhone 14 Pro Max", pageable);
+        assertEquals(1, products.size());
+        assertEquals("Apple iPhone 14 Pro Max", products.get(0).getName());
+    }
+
+    // query annotation test
+    @Test
+    void searchProduct() {
+        List<Product> products = productRepository.searchProduct("%iPhone%");
+        assertEquals(2, products.size());
+
+        products = productRepository.searchProduct("%Gadget%");
+        assertEquals(2, products.size());
+    }
+
+    // query annotation test with pageable and sort
+    @Test
+    void searchProductPageableSort() {
+        Pageable pageable = PageRequest.of(0, 1, Sort.by(Sort.Order.desc("id")));
+        Page<Product> products = productRepository.searchProduct("%iPhone%", pageable);
+        assertEquals(1, products.getContent().size());
+
+        assertEquals(0, products.getNumber());
+        assertEquals(2, products.getTotalPages());
+        assertEquals(2, products.getTotalElements());
+
+        products = productRepository.searchProduct("%Gadget%", pageable);
+        assertEquals(1, products.getContent().size());
+
+        assertEquals(0, products.getNumber());
+        assertEquals(2, products.getTotalPages());
+        assertEquals(2, products.getTotalElements());
+    }
+
+    @Test
+    void modifying() {
+        transactionOperations.executeWithoutResult(transactionStatus -> {
+            int total = productRepository.deleteProductUsingName("Wrong");
+            assertEquals(0, total);
+
+            total = productRepository.updateProductPriceToZero(1L);
+            assertEquals(1, total);
+
+            Product product = productRepository.findById(1L).orElse(null);
+            assertNotNull(product);
+            assertEquals(0L, product.getPrice());
+        });
+    }
+
+    @Test
+    void streamAllByCategory() {
+        transactionOperations.executeWithoutResult(transactionStatus -> {
+            Category category = categoryRepository.findById(1L).orElse(null);
+            assertNotNull(category);
+
+            Stream<Product> products = productRepository.streamAllByCategory(category);
+            products.forEach(product -> System.out.println(product.getId() + " : " + product.getName() ));
+        });
+    }
+
+    @Test
+    void findAllByCategorySlice() {
+      Pageable firstPage = PageRequest.of(0, 1);
+      Category category = categoryRepository.findById(1L).orElse(null);
+      assertNotNull(category);
+
+      Slice<Product> slice = productRepository.findAllByCategory(category, firstPage);
+      // tampilkan content product
+      while(slice.hasNext()) {
+        slice = productRepository.findAllByCategory(category, slice.nextPageable());
+        // tampilkan content product
+      }
+    }
+
+    @Test
+    void lock1() {
+        transactionOperations.executeWithoutResult(transactionStatus -> {
+            try {
+                Product product = productRepository.findFirstByIdEquals(1L).orElse(null);
+                assertNotNull(product);
+                product.setPrice(30_000_000L);
+
+                Thread.sleep(20_000L);
+                productRepository.save(product);
+            } catch (InterruptedException exception) {
+                throw new RuntimeException(exception);
+            }
+
+        });
+    }
+
+    @Test
+    void lock2() {
+        transactionOperations.executeWithoutResult(transactionStatus -> {
+            Product product = productRepository.findFirstByIdEquals(1L).orElse(null);
+            assertNotNull(product);
+            product.setPrice(10_000_000L);
+            productRepository.save(product);
+
+        });
+    }
+
+    @Test
+    void specification() {
+        Specification<Product> specification = (root, citeria, builder) -> {
+            return citeria.where(
+                builder.or(
+                    builder.equal(root.get("name"), "Apple iPhone 14 Pro Max"),
+                    builder.equal(root.get("name"), "Apple iPhone 13 Pro Max")
+                )
+            ).getRestriction();
+        };
+
+        List<Product> products = productRepository.findAll(specification);
+        assertEquals(2, products.size());
+    }
+
+    @Test
+    void projection() {
+        List<SimpleProduct> simpleProducts = productRepository.findAllByNameLike("%Apple%", SimpleProduct.class);
+        assertEquals(2, simpleProducts.size());
+
+        List<ProductPrice> productPrices = productRepository.findAllByNameLike("%Apple%", ProductPrice.class);
+        assertEquals(2, productPrices.size());
     }
 }
