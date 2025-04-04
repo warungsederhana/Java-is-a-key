@@ -48,4 +48,12 @@ public class AuthService implements AuthServiceI {
       throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid username or password");
     }
   }
+
+  @Override
+  @Transactional
+  public void logout(User user) {
+    user.setToken(null);
+    user.setTokenExpiredAt(null);
+    userRepository.save(user);
+  }
 }
