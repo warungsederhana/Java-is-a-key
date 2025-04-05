@@ -142,8 +142,8 @@ Response Body (Success):
     }
   ],
   "paging": {
-    "current_page": 0,
-    "total_page": 10,
+    "currentPage": 0,
+    "totalPage": 10,
     "size": 10
   }
 }
