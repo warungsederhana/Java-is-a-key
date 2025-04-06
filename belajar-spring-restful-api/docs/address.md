@@ -2,7 +2,7 @@
 
 ## Create Address
 
-Endpoint: POST `/api/contact/{idContact}/address`
+Endpoint: POST `/api/contacts/{contactId}/addresses`
 
 Request Header:
 
@@ -45,7 +45,7 @@ Response Body (Failed):
 
 ## Update Address
 
-Endpoint: PUT `/api/contact/{idContact}/address/{idAddress}`
+Endpoint: PUT `/api/contacts/{contactId}/addresses/{addressId}`
 
 Request Header:
 
@@ -88,7 +88,7 @@ Response Body (Failed):
 
 ## Get Address
 
-Endpoint: GET `/api/contact/{idContact}/address/{idAddress}`
+Endpoint: GET `/api/contacts/{contactId}/addresses/{addressId}`
 
 Request Header:
 
@@ -119,7 +119,7 @@ Response Body (Failed):
 
 ## Remove Address
 
-Endpoint: DELETE `/api/contact/{idContact}/address/{idAddress}`
+Endpoint: DELETE `/api/contacts/{contactId}/addresses/{addressId}`
 
 Request Header:
 
@@ -143,7 +143,7 @@ Response Body (Failed):
 
 ## List Address
 
-Endpoint: GET `/api/contact/{idContact}/addresses`
+Endpoint: GET `/api/contacts/{contactId}/addresses`
 
 Request Header:
 

@@ -1,4 +1,4 @@
--- Active: 1743597616736@@127.0.0.1@3306@belajar_spring_restful_api
+-- Active: 1743597616736@@127.0.0.1@3306@belajar_spring_restful_api 
 CREATE TABLE users (
     username VARCHAR(100) NOT NULL,
     password VARCHAR(100) NOT NULL,
