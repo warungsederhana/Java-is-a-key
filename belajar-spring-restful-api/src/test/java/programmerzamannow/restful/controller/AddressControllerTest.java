@@ -21,6 +21,7 @@ import programmerzamannow.restful.repository.ContactRepository;
 import programmerzamannow.restful.repository.UserRepository;
 import programmerzamannow.restful.security.BCrypt;
 
+import java.util.List;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -73,7 +74,7 @@ class AddressControllerTest {
 
   @Test
   void createAddressBadRequest() throws Exception {
-    CreateAddressRequest addressRequest= new CreateAddressRequest();
+    CreateAddressRequest addressRequest = new CreateAddressRequest();
     addressRequest.setCountry("");
 
     mockMvc.perform(
@@ -95,7 +96,7 @@ class AddressControllerTest {
 
   @Test
   void createAddressSuccess() throws Exception {
-    CreateAddressRequest addressRequest= new CreateAddressRequest();
+    CreateAddressRequest addressRequest = new CreateAddressRequest();
     addressRequest.setStreet("Jalan Raya");
     addressRequest.setCity("Jakarta");
     addressRequest.setProvince("DKI Jakarta");
@@ -161,7 +162,7 @@ class AddressControllerTest {
     addressRepository.save(address);
 
     mockMvc.perform(
-        get("/api/contacts/test/addresses/"+address.getId())
+        get("/api/contacts/test/addresses/" + address.getId())
             .accept(MediaType.APPLICATION_JSON_VALUE)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .header("X-API-TOKEN", "test")
@@ -186,7 +187,7 @@ class AddressControllerTest {
 
   @Test
   void updateAddressBadRequest() throws Exception {
-    UpdateAddressRequest request= new UpdateAddressRequest();
+    UpdateAddressRequest request = new UpdateAddressRequest();
     request.setCountry("");
 
     mockMvc.perform(
@@ -221,7 +222,7 @@ class AddressControllerTest {
     address.setPostalCode("12345");
     addressRepository.save(address);
 
-    UpdateAddressRequest request= new UpdateAddressRequest();
+    UpdateAddressRequest request = new UpdateAddressRequest();
     request.setStreet("Jalan Raya Updated");
     request.setCity("Jakarta Updated");
     request.setProvince("DKI Jakarta Updated");
@@ -287,7 +288,7 @@ class AddressControllerTest {
     addressRepository.save(address);
 
     mockMvc.perform(
-        delete("/api/contacts/test/addresses/"+address.getId())
+        delete("/api/contacts/test/addresses/" + address.getId())
             .accept(MediaType.APPLICATION_JSON_VALUE)
             .contentType(MediaType.APPLICATION_JSON_VALUE)
             .header("X-API-TOKEN", "test")
@@ -303,6 +304,60 @@ class AddressControllerTest {
 
       assertEquals("OK", response.getData());
       assertFalse(addressRepository.existsById(address.getId()));
+    });
+  }
+
+  @Test
+  void listAddressNotFound() throws Exception {
+    mockMvc.perform(
+        get("/api/contacts/not-found/addresses")
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .header("X-API-TOKEN", "test")
+    ).andExpectAll(
+        status().isNotFound()
+    ).andDo(result -> {
+      String contentAsString = result.getResponse().getContentAsString();
+      WebResponse<String> response = objectMapper.readValue(contentAsString, new TypeReference<>() {
+      });
+
+      assertNotNull(response.getErrors());
+    });
+  }
+
+  @Test
+  void listAddressSuccess() throws Exception {
+    Contact contact = contactRepository.findById("test").orElseThrow();
+    assertNotNull(contact);
+
+    for (int i = 0; i < 5; i++) {
+      Address address = new Address();
+      address.setContact(contact);
+      address.setId(UUID.randomUUID().toString());
+      address.setStreet("Jalan Raya " + i);
+      address.setCity("Jakarta " + i);
+      address.setProvince("DKI Jakarta " + i);
+      address.setCountry("Indonesia " + i);
+      address.setPostalCode("12345 " + i);
+      addressRepository.save(address);
+    }
+
+    mockMvc.perform(
+        get("/api/contacts/test/addresses" )
+            .accept(MediaType.APPLICATION_JSON_VALUE)
+            .contentType(MediaType.APPLICATION_JSON_VALUE)
+            .header("X-API-TOKEN", "test")
+    ).andExpectAll(
+        status().isOk()
+    ).andDo(result -> {
+      String contentAsString = result.getResponse().getContentAsString();
+      WebResponse<List<AddressResponse>> response = objectMapper.readValue(contentAsString, new TypeReference<>() {
+      });
+
+      assertNull(response.getErrors());
+      assertNotNull(response.getData());
+
+      assertEquals(5, response.getData().size());
     });
   }
 }

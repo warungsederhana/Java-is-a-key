@@ -5,6 +5,8 @@ import programmerzamannow.restful.model.address.AddressResponse;
 import programmerzamannow.restful.model.address.CreateAddressRequest;
 import programmerzamannow.restful.model.address.UpdateAddressRequest;
 
+import java.util.List;
+
 public interface AddressServiceI {
 
   public AddressResponse create(User user, CreateAddressRequest request);
@@ -14,4 +16,6 @@ public interface AddressServiceI {
   public AddressResponse update(User user, UpdateAddressRequest request);
 
   public void remove(User user, String contactId, String addressId);
+
+  public List<AddressResponse> list(User user, String contactId);
 }
